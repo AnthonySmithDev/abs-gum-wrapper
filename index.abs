@@ -1,0 +1,54 @@
+gum = {}
+
+f run(cmd){
+  output="/tmp/output"
+  exec("$cmd > $output")
+  `cat $output`
+}
+
+f run_bool(cmd){
+  output="/tmp/output"
+	exec("$cmd && echo 1 > $output || echo 0 > $output")
+  `cat $output`
+}
+
+# Prompt for some input
+gum.input = f(){
+	run("gum input")
+}
+
+# Prompt for long-form text
+gum.write = f(){
+	run("gum write")
+}
+
+# Filter items from a list
+gum.filter = f(items = []){
+	list="/tmp/list"
+	for k,v in items {
+		if k == 0 {
+			"$v\n" > list
+		} else {
+			"$v\n" >> list
+		}
+	}
+	run("cat $list | gum filter")
+}
+
+# Choose an option from a list of choices
+gum.choose = f(opts = []){
+	o = opts.join(" ")
+	run("gum choose --no-limit $o").lines()
+}
+
+# Ask a user to confirm an action
+gum.confirm = f(prompt = ""){
+	run_bool("gum confirm $prompt")
+}
+
+# Pick a file from a folder
+gum.file = f(path){
+	run("gum file $path")
+}
+
+return gum
